@@ -1,0 +1,15 @@
+{
+  "manifest_version": 3,
+  "name": "Hublead LinkedIn Attio Bridge",
+  "description": "Sync LinkedIn company pages to Attio through the Hublead backend.",
+  "version": "0.1.0",
+  "permissions": ["storage"],
+  "host_permissions": ["http://localhost/*", "http://127.0.0.1/*", "https://www.linkedin.com/company/*", "https://linkedin.com/company/*"],
+  "content_scripts": [
+    {
+      "matches": ["https://www.linkedin.com/company/*", "https://linkedin.com/company/*"],
+      "js": ["dist/content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -4,7 +4,10 @@
   "description": "Sync LinkedIn company pages to Attio through the Hublead backend.",
   "version": "0.1.0",
   "permissions": ["storage"],
-  "host_permissions": ["http://localhost/*", "http://127.0.0.1/*", "https://www.linkedin.com/company/*", "https://linkedin.com/company/*"],
+  "host_permissions": ["http://host.docker.internal/*", "http://localhost/*", "http://127.0.0.1/*", "https://www.linkedin.com/company/*", "https://linkedin.com/company/*"],
+  "background": {
+    "service_worker": "dist/background.js"
+  },
   "content_scripts": [
     {
       "matches": ["https://www.linkedin.com/company/*", "https://linkedin.com/company/*"],

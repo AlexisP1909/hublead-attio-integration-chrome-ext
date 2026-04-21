@@ -62,6 +62,10 @@ describe("apiClient", () => {
       "http://localhost:8080/api/companies/sync",
       expect.objectContaining({
         method: "POST",
+        headers: expect.objectContaining({
+          "X-Hublead-Client": "chrome-extension",
+          "Content-Type": "application/json"
+        }),
         body: JSON.stringify(company)
       })
     );

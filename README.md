@@ -34,7 +34,7 @@ To load the extension:
 4. Click **Load unpacked**.
 5. Select the `extension/` folder.
 
-The backend URL defaults to `http://localhost:8080`. You can change it from the Hublead panel on a LinkedIn company page.
+The backend URL defaults to `http://localhost:8080`, which is the Docker-published backend port on the host machine. You can change it from the Hublead panel on a LinkedIn company page.
 
 ## Backend API
 

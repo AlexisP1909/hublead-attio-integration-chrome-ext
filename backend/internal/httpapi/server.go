@@ -38,6 +38,7 @@ func NewServer(app App, health HealthStore, allowedOrigins []string, logger *slo
 	s := &Server{app: app, health: health, logger: logger}
 
 	r := chi.NewRouter()
+	r.Use(requestLogger(logger))
 	r.Use(cors(allowedOrigins))
 	r.Get("/healthz", s.healthz)
 	r.Get("/api/companies/lookup", s.lookupCompany)
@@ -125,10 +126,10 @@ func cors(allowedOrigins []string) func(http.Handler) http.Handler {
 	return func(next http.Handler) http.Handler {
 		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			origin := r.Header.Get("Origin")
-			if _, ok := allowed[origin]; ok {
+			if isAllowedOrigin(origin, allowed) {
 				w.Header().Set("Access-Control-Allow-Origin", origin)
 				w.Header().Set("Vary", "Origin")
-				w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+				w.Header().Set("Access-Control-Allow-Headers", "Content-Type, X-Hublead-Client")
 				w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")
 			}
 
@@ -137,6 +138,31 @@ func cors(allowedOrigins []string) func(http.Handler) http.Handler {
 				return
 			}
 
+			next.ServeHTTP(w, r)
+		})
+	}
+}
+
+func isAllowedOrigin(origin string, allowed map[string]struct{}) bool {
+	if origin == "" {
+		return false
+	}
+	if _, ok := allowed[origin]; ok {
+		return true
+	}
+	return strings.HasPrefix(origin, "chrome-extension://")
+}
+
+func requestLogger(logger *slog.Logger) func(http.Handler) http.Handler {
+	return func(next http.Handler) http.Handler {
+		return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			logger.Info("http request",
+				"method", r.Method,
+				"path", r.URL.Path,
+				"origin", r.Header.Get("Origin"),
+				"hublead_client", r.Header.Get("X-Hublead-Client"),
+				"user_agent", r.Header.Get("User-Agent"),
+			)
 			next.ServeHTTP(w, r)
 		})
 	}

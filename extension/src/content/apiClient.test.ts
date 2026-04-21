@@ -77,6 +77,16 @@ describe("apiClient", () => {
     });
   });
 
+  it("throws auth errors when Attio credentials are rejected", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: "Attio credentials were rejected" }), { status: 401 })));
+
+    await expect(syncCompany("http://localhost:8080", company)).rejects.toMatchObject({
+      kind: "auth",
+      message: "Attio credentials were rejected",
+      status: 401
+    });
+  });
+
   it("throws network errors when the backend is unreachable", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("Failed to fetch")));
 

@@ -1,5 +1,6 @@
 .env
 node_modules/
 extension/dist/
+backend/backend
 coverage/
 .DS_Store

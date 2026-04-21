@@ -71,6 +71,9 @@ async function parseJsonResponse<T>(response: Response): Promise<T> {
     if (response.status === 404) {
       throw new ApiError(message, "not_found", response.status);
     }
+    if (response.status === 401 || response.status === 403) {
+      throw new ApiError(message, "auth", response.status);
+    }
     if (response.status >= 500) {
       throw new ApiError(message, "server", response.status);
     }

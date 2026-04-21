@@ -39,7 +39,7 @@ export type SyncResponse = {
   company: CompanySummary;
 };
 
-export type ApiErrorKind = "validation" | "not_found" | "network" | "server" | "unknown";
+export type ApiErrorKind = "validation" | "not_found" | "network" | "auth" | "server" | "unknown";
 
 export class ApiError extends Error {
   readonly kind: ApiErrorKind;

@@ -43,6 +43,10 @@ describe("extension manifest", () => {
     }
   });
 
+  it("uses a Manifest V3 service worker for backend requests", () => {
+    expect(chromeManifest.background?.service_worker).toBe("dist/background.js");
+  });
+
   it("does not relax extension page CSP for dynamic code execution", () => {
     const csp =
       typeof chromeManifest.content_security_policy === "string"
@@ -73,6 +77,7 @@ describe("extension manifest", () => {
   it("keeps permissions explicit and MV3-compatible", () => {
     expect(chromeManifest.permissions).toEqual(["storage"]);
     expect(chromeManifest.host_permissions).toEqual([
+      "http://host.docker.internal/*",
       "http://localhost/*",
       "http://127.0.0.1/*",
       "https://www.linkedin.com/company/*",

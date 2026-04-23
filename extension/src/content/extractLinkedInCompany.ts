@@ -101,9 +101,16 @@ function firstWebsiteCandidate(doc: Document): Candidate | undefined {
   const websiteAnchor = anchors.find((anchor) => {
     const text = normalizeWhitespace(anchor.textContent ?? "").toLowerCase();
     const href = anchor.href;
+    const ariaLabel = normalizeWhitespace(anchor.getAttribute("aria-label") ?? "").toLowerCase();
+    const dataControlName = anchor.getAttribute("data-control-name")?.toLowerCase() ?? "";
+    const dataTestId = anchor.getAttribute("data-test-id")?.toLowerCase() ?? "";
+
     return (
       text.includes("website") ||
-      anchor.getAttribute("data-control-name")?.toLowerCase().includes("website") ||
+      ariaLabel.includes("website") ||
+      dataControlName.includes("website") ||
+      dataTestId.includes("website") ||
+      href.includes("/redir/redirect") ||
       (/^https?:\/\//.test(href) && !href.includes("linkedin.com"))
     );
   });

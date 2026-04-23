@@ -62,6 +62,10 @@ describe("apiClient", () => {
       "http://localhost:8080/api/companies/sync",
       expect.objectContaining({
         method: "POST",
+        headers: expect.objectContaining({
+          "X-Hublead-Client": "chrome-extension",
+          "Content-Type": "application/json"
+        }),
         body: JSON.stringify(company)
       })
     );
@@ -74,6 +78,16 @@ describe("apiClient", () => {
       kind: "validation",
       message: "domain is required",
       status: 422
+    });
+  });
+
+  it("throws auth errors when Attio credentials are rejected", async () => {
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ error: "Attio credentials were rejected" }), { status: 401 })));
+
+    await expect(syncCompany("http://localhost:8080", company)).rejects.toMatchObject({
+      kind: "auth",
+      message: "Attio credentials were rejected",
+      status: 401
     });
   });
 

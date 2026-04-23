@@ -30,6 +30,20 @@ describe("extractLinkedInCompany", () => {
     expect(company.name).toBe("Example Company");
     expect(company.extraction_debug.warnings).toContain("Could not confidently extract a company name from the page.");
   });
+
+  it("extracts website URLs from LinkedIn redirect links", () => {
+    document.body.innerHTML = `
+      <main>
+        <h1>HappyRobot</h1>
+        <a href="https://www.linkedin.com/redir/redirect?url=https%3A%2F%2Fwww.happyrobot.ai%2F" aria-label="Website">Visit</a>
+      </main>
+    `;
+
+    const company = extractLinkedInCompany(document, "https://www.linkedin.com/company/happyrobot/");
+
+    expect(company.website_url).toBe("https://www.happyrobot.ai/");
+    expect(company.domain).toBe("happyrobot.ai");
+  });
 });
 
 describe("normalization helpers", () => {

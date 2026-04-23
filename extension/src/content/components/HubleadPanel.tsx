@@ -30,16 +30,18 @@ export function HubleadPanel({ company }: Props) {
   const [lookupState, setLookupState] = useState<LookupState>({ status: "loading" });
   const [syncState, setSyncState] = useState<SyncState>({ status: "idle" });
 
+  const isMissingDomain = !company.domain;
   const canSync = Boolean(company.name && company.linkedin_url && company.domain);
+  const aboutUrl = `${company.linkedin_url.replace(/\/+$/, "")}/about/`;
   const syncBlocker = useMemo(() => {
-    if (!company.domain) {
-      return "A website/domain is required before the backend can match an Attio company.";
+    if (isMissingDomain) {
+      return "A website/domain is required. LinkedIn usually shows it on the About tab.";
     }
     if (!company.name) {
       return "A company name is required before syncing.";
     }
     return undefined;
-  }, [company.domain, company.name]);
+  }, [company.name, isMissingDomain]);
 
   useEffect(() => {
     let cancelled = false;
@@ -73,6 +75,11 @@ export function HubleadPanel({ company }: Props) {
   }
 
   async function handleSync() {
+    if (isMissingDomain) {
+      window.location.assign(aboutUrl);
+      return;
+    }
+
     setSyncState({ status: "syncing" });
     try {
       const response = await syncCompany(backendUrl, company);
@@ -141,8 +148,13 @@ export function HubleadPanel({ company }: Props) {
 
         {syncBlocker && <StatusMessage tone="warning" title="Needs review" message={syncBlocker} />}
 
-        <button className="hublead-primary" type="button" disabled={!canSync || syncState.status === "syncing"} onClick={() => void handleSync()}>
-          {syncState.status === "syncing" ? "Syncing..." : visibleCompany ? "Resync company" : "Add to Attio"}
+        <button
+          className="hublead-primary"
+          type="button"
+          disabled={(!canSync && !isMissingDomain) || syncState.status === "syncing"}
+          onClick={() => void handleSync()}
+        >
+          {isMissingDomain ? "Open About tab" : syncState.status === "syncing" ? "Syncing..." : visibleCompany ? "Resync company" : "Add to Attio"}
         </button>
       </section>
 
